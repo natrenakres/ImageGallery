@@ -1,0 +1,26 @@
+﻿version: '3.4'
+
+services:
+  imagegallery.api:
+    image: imagegallery.api
+    build:
+      context: .
+      dockerfile: ImageGallery.API/Dockerfile
+  imagegallery.database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ig_mssql
+    hostname: ig_sql
+    environment:
+      - MSSQL_SA_PASSWORD=1q2w3e4R!
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./.containers/database/data:/var/opt/mssql/data
+      - ./.containers/database/log:/var/opt/mssql/log
+      - ./.containers/database/secrets:/var/opt/mssql/secrets
+    networks:
+      - ig_net
+networks:
+  ig_net:
+    driver: bridge

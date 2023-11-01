@@ -7,12 +7,12 @@ namespace ImageGallery.Application.Images.AddImage;
 
 public class AddImageCommandHandler : IRequestHandler<AddImageCommand, Result<ImageResponse>>
 {
-    private readonly IImageService _imageService;
+    private readonly IImageFileService _imageFileService;
     private readonly IGalleryRepository _galleryRepository;
 
-    public AddImageCommandHandler(IImageService imageService, IGalleryRepository galleryRepository)
+    public AddImageCommandHandler(IImageFileService imageFileService, IGalleryRepository galleryRepository)
     {
-        _imageService = imageService;
+        _imageFileService = imageFileService;
         _galleryRepository = galleryRepository;
     }
 
@@ -20,7 +20,7 @@ public class AddImageCommandHandler : IRequestHandler<AddImageCommand, Result<Im
     {
         var entity = Image.Create(request.Tile);
         
-        var fileName = await _imageService.CreateImage(request.Bytes);
+        var fileName = await _imageFileService.CreateImage(request.Bytes);
         entity.AddFileName(fileName);
         _galleryRepository.AddImage(entity);
         await _galleryRepository.SaveChangesAsync();
