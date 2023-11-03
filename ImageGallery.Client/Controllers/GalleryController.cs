@@ -63,7 +63,8 @@ public class GalleryController : Controller
         return RedirectToAction("Index");
     }
 
-    [Authorize(Roles = "PayingUser")]
+    //[Authorize(Roles = "PayingUser")]
+    [Authorize(Policy = "UserCanAddImage")]
     public IActionResult AddImage()
     {
         return View();
@@ -71,7 +72,8 @@ public class GalleryController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "PayingUser")]
+    //[Authorize(Roles = "PayingUser")]
+     [Authorize(Policy = "UserCanAddImage")]
     public async Task<IActionResult> AddImage(AddImageViewModel addImageViewModel)
     {
         if (!ModelState.IsValid)
@@ -104,6 +106,10 @@ public class GalleryController : Controller
         var identityToken = await HttpContext
             .GetTokenAsync(OpenIdConnectParameterNames.IdToken);
 
+        var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+        var refreshToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken);
+
         var userClaimsStringBuilder = new StringBuilder();
         foreach (var claim in User.Claims)
         {
@@ -111,5 +117,7 @@ public class GalleryController : Controller
         }
 
         _logger.LogInformation($"Identity token & user claims: " + $"\n{identityToken} \n {userClaimsStringBuilder}");
+        _logger.LogInformation($"Access token:  \n{accessToken}");
+        _logger.LogInformation($"Refresh token:  \n{refreshToken}");
     }
 }

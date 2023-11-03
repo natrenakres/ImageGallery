@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using ImageGallery.Infrastructure.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -41,6 +42,10 @@ public static class DependencyInjection
                 options.ClientSecret = "secret";
                 options.ResponseType = "code";
                 options.Scope.Add("roles");
+                options.Scope.Add("image-gallery-api.read");
+                options.Scope.Add("image-gallery-api.write");
+                options.Scope.Add("country");
+                options.Scope.Add("offline_access");
                 // options.Scope.Add("openid"); By default added
                 // options.Scope.Add("profile"); By default
                 //options.CallbackPath = new PathString("signin-oidc"); By default
@@ -49,12 +54,19 @@ public static class DependencyInjection
                 options.ClaimActions.DeleteClaim("sid");
                 options.ClaimActions.DeleteClaim("idp");
                 options.ClaimActions.MapJsonKey("role", "role");
+                options.ClaimActions.MapUniqueJsonKey("country", "country");
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     NameClaimType = "given_name",
                     RoleClaimType = "role"
                 };
             });
+
+        services.AddAuthorization(options =>
+        {   
+            options.AddPolicy("UserCanAddImage", AuthorizationPolicies.CanAddImage());
+
+        });
 
         return services;
     }
